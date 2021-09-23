@@ -15,7 +15,7 @@ for obj in cubes:
     
     
 #define our bubblesort functions
-def bubble_sort(locations):
+def bubble_sort(x):
 
     #create a while-loop for has_swapped
     has_swapped = True
@@ -25,28 +25,16 @@ def bubble_sort(locations):
         
         #first set the has_swapped to false to ensure that the loop will end at some point.
         has_swapped = False
-        for i in range(len(locations) - num_of_iterations - 1):
+        for i in range(len(x) - num_of_iterations - 1):
             #Classic bubblesort:
-            if locations[i] > locations[i+1]:
-                locations[i], locations[i+1] = locations[i+1], locations[i]
+            if x[i] > x[i+1]:
+                x[i], x[i+1] = x[i+1], x[i]
                 
-                #if locations[i] > locations[i+1], it will reset has_swapped =true, ensuring the loop will continue untill all possible sortings have been achieved.
+                #if x[i] > x[i+1], it will reset has_swapped =true, ensuring the loop will continue untill all possible sortings have been achieved.
                 has_swapped = True
         #due to the nature of bubblesorts, the last item every loop in the list will be as sorted as can be. Add an iteration to reduce the amount of bubblesort comparisons each loop. 
         num_of_iterations += 1
-
-def bubble_sort(dimensions):
-    has_swapped = True
-    num_of_iterations = 0
-
-    while(has_swapped):
-        has_swapped = False
-        for i in range(len(dimensions) - num_of_iterations - 1):
-            if dimensions[i] > dimensions[i+1]:
-                dimensions[i], dimensions[i+1] = dimensions[i+1], dimensions[i]
-                has_swapped = True
-        num_of_iterations += 1
-        
+    
 #run the functions
 bubble_sort(locations)
 bubble_sort(dimensions)
