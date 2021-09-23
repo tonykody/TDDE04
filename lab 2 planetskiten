@@ -22,22 +22,22 @@ def randomray():
 
 
 while len(num_flower) < 200:
-rand_ray = randomray()
+    rand_ray = randomray()
 
 
-dp = bpy.context.view_layer.depsgraph
-begin = planet.location + rand_ray*10
-direction = planet.location - begin 
+    dp = bpy.context.view_layer.depsgraph
+    begin = planet.location + rand_ray*10
+    direction = planet.location - begin 
 
-res = bpy.context.scene.ray_cast(dp, begin, direction)
-hit, loc, norm, poly_ind, obj, mtrx = res
+    res = bpy.context.scene.ray_cast(dp, begin, direction)
+    hit, loc, norm, poly_ind, obj, mtrx = res
 
-numm =planet.data.polygons[poly_ind].material_index
+    numm =planet.data.polygons[poly_ind].material_index
 
-if hit and numm == 0: 
-    up = Vector((0.0, 0.0, 1.0))
-    print(poly_ind, norm)
-    rot = up.rotation_difference(norm).to_euler()
-    blomma.rotation_euler = rot
-    help.copy_obj(blomma, "add", loc.copy(), norm)
+    if hit and numm == 0: 
+        up = Vector((0.0, 0.0, 1.0))
+        print(poly_ind, norm)
+        rot = up.rotation_difference(norm).to_euler()
+        blomma.rotation_euler = rot
+        help.copy_obj(blomma, "add", loc.copy(), norm)
     
