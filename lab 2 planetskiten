@@ -1,0 +1,43 @@
+# Skriv namn på de som lämnat in här i kommentaren för enklare tillgång
+
+import bpy
+from mathutils import Vector 
+from random import uniform
+
+up = Vector((0.0 , 0.0 , 1.0))
+
+help = bpy.data.texts["helper"].as_module()
+num_flower=list(bpy.data.collections["add"].objects)
+planet = bpy.data.objects["planet"]
+blomma = bpy.data.objects["blomma"]
+
+#help.clean("add")
+
+def randomray():
+    r = Vector((uniform(-1,1), uniform(-1,1), uniform(-1,1)))
+    while r.magnitude == 0.0:
+        r = Vector((uniform(-1,1), uniform(-1,1), uniform(-1,1)))
+    r.normalize()
+    return r
+
+
+while len(num_flower) < 200:
+rand_ray = randomray()
+
+
+dp = bpy.context.view_layer.depsgraph
+begin = planet.location + rand_ray*10
+direction = planet.location - begin 
+
+res = bpy.context.scene.ray_cast(dp, begin, direction)
+hit, loc, norm, poly_ind, obj, mtrx = res
+
+numm =planet.data.polygons[poly_ind].material_index
+
+if hit and numm == 0: 
+    up = Vector((0.0, 0.0, 1.0))
+    print(poly_ind, norm)
+    rot = up.rotation_difference(norm).to_euler()
+    blomma.rotation_euler = rot
+    help.copy_obj(blomma, "add", loc.copy(), norm)
+    
