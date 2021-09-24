@@ -1,5 +1,4 @@
-# Skriv namn på de som lämnat in här i kommentaren för enklare tillgång
-
+#antni955 hugad288
 import bpy
 from mathutils import Vector 
 from random import uniform
@@ -7,11 +6,13 @@ from random import uniform
 up = Vector((0.0 , 0.0 , 1.0))
 
 help = bpy.data.texts["helper"].as_module()
-num_flower=list(bpy.data.collections["add"].objects)
+help.clean("add")
+num_flower = list(bpy.data.collections["add"].objects)
 planet = bpy.data.objects["planet"]
 blomma = bpy.data.objects["blomma"]
 
-#help.clean("add")
+#help.copy_obj(obj, "models", loc, rot): 
+#help.copy_obj(blomma, "add", loc.copy(), norm)
 
 def randomray():
     r = Vector((uniform(-1,1), uniform(-1,1), uniform(-1,1)))
@@ -21,9 +22,9 @@ def randomray():
     return r
 
 
+
 while len(num_flower) < 200:
     rand_ray = randomray()
-
 
     dp = bpy.context.view_layer.depsgraph
     begin = planet.location + rand_ray*10
@@ -34,10 +35,16 @@ while len(num_flower) < 200:
 
     numm =planet.data.polygons[poly_ind].material_index
 
-    if hit and numm == 0: 
-        up = Vector((0.0, 0.0, 1.0))
-        print(poly_ind, norm)
-        rot = up.rotation_difference(norm).to_euler()
-        blomma.rotation_euler = rot
-        help.copy_obj(blomma, "add", loc.copy(), norm)
-    
+    if hit and numm == 0:
+        #if #inte nära:
+            up = Vector((0.0, 0.0, 1.0))
+            rot = up.rotation_difference(norm).to_euler()
+            blomma.rotation_euler = rot
+           # for i in num_flower:
+                #if (i.location - rand_ray).magnitude > 0.000000000000001:
+            help.copy_obj(blomma, "add", loc.copy(), norm)
+            num_flower = list(bpy.data.collections["add"].objects)
+                
+        #else:
+        
+    #print(rand_ray.magnitude)
