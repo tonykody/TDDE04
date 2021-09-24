@@ -1,46 +1,50 @@
 #antni955 hugad288
-
 import bpy
+from mathutils import Vector 
+from random import uniform
 
-cubes=list(bpy.data.collections["cubes"].objects)
+up = Vector((0.0 , 0.0 , 1.0))
 
-#set up new empty lists to populate with relevant data from blender.
-locations=[]
-dimensions=[]
+help = bpy.data.texts["helper"].as_module()
+help.clean("add")
+num_flower = list(bpy.data.collections["add"].objects)
+planet = bpy.data.objects["planet"]
+blomma = bpy.data.objects["blomma"]
 
-#populate the lists
-for obj in cubes:
-    locations.append(obj.location.x)
-    dimensions.append(obj.dimensions.x)
-    
-    
-#define our bubblesort functions
-def bubble_sort(x):
+#help.copy_obj(obj, "models", loc, rot): 
+#help.copy_obj(blomma, "add", loc.copy(), norm)
 
-    #create a while-loop for has_swapped
-    has_swapped = True
-    num_of_iterations = 0
+def randomray():
+    r = Vector((uniform(-1,1), uniform(-1,1), uniform(-1,1)))
+    while r.magnitude == 0.0:
+        r = Vector((uniform(-1,1), uniform(-1,1), uniform(-1,1)))
+    r.normalize()
+    return r
 
-    while(has_swapped):
-        
-        #first set the has_swapped to false to ensure that the loop will end at some point.
-        has_swapped = False
-        for i in range(len(x) - num_of_iterations - 1):
-            #Classic bubblesort:
-            if x[i] > x[i+1]:
-                x[i], x[i+1] = x[i+1], x[i]
+
+
+while len(num_flower) < 200:
+    rand_ray = randomray()
+
+    dp = bpy.context.view_layer.depsgraph
+    begin = planet.location + rand_ray*10
+    direction = planet.location - begin 
+
+    res = bpy.context.scene.ray_cast(dp, begin, direction)
+    hit, loc, norm, poly_ind, obj, mtrx = res
+
+    numm =planet.data.polygons[poly_ind].material_index
+
+    if hit and numm == 0:
+        #if #inte nära:
+            up = Vector((0.0, 0.0, 1.0))
+            rot = up.rotation_difference(norm).to_euler()
+            blomma.rotation_euler = rot
+           # for i in num_flower:
+                #if (i.location - rand_ray).magnitude > 0.000000000000001:
+            help.copy_obj(blomma, "add", loc.copy(), norm)
+            num_flower = list(bpy.data.collections["add"].objects)
                 
-                #if x[i] > x[i+1], it will reset has_swapped =true, ensuring the loop will continue untill all possible sortings have been achieved.
-                has_swapped = True
-        #due to the nature of bubblesorts, the last item every loop in the list will be as sorted as can be. Add an iteration to reduce the amount of bubblesort comparisons each loop. 
-        num_of_iterations += 1
-    
-#run the functions
-bubble_sort(locations)
-bubble_sort(dimensions)
-
-#with our new sorted lists, replace the item with smallest x-dimension to the position of the item with the lowest x-position.
-for obj in cubes:
-    for i in range(len(cubes)):
-        if obj.dimensions.x == dimensions[i]:
-            obj.location.x = locations[i]
+        #else:
+        
+    #print(rand_ray.magnitude)
