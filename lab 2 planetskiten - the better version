@@ -22,30 +22,11 @@ def randomray():
     r.normalize()
     return r
 
-while len(num_flower) == 0:
-    rand_ray = randomray()
-
-    dp = bpy.context.view_layer.depsgraph
-    begin = planet.location + rand_ray*10
-    direction = planet.location - begin 
-
-    res = bpy.context.scene.ray_cast(dp, begin, direction)
-    hit, loc, norm, poly_ind, obj, mtrx = res
-
-    numm =planet.data.polygons[poly_ind].material_index
-
-    if hit and numm == 0:
-        
-            up = Vector((0.0, 0.0, 1.0))
-            rot = up.rotation_difference(norm).to_euler()
-            blomma.rotation_euler = rot
-            help.copy_obj(blomma, "add", loc.copy(), norm)
-            num_flower = list(bpy.data.collections["add"].objects)
-            locations.append(loc)
+count = 0
 
 while len(num_flower) < 201:
     rand_ray = randomray()
-
+    count += 1
     dp = bpy.context.view_layer.depsgraph
     begin = planet.location + rand_ray*10
     direction = planet.location - begin 
@@ -53,28 +34,30 @@ while len(num_flower) < 201:
     res = bpy.context.scene.ray_cast(dp, begin, direction)
     hit, loc, norm, poly_ind, obj, mtrx = res
 
-    numm =planet.data.polygons[poly_ind].material_index
-
+    numm = planet.data.polygons[poly_ind].material_index
+   
+    if hit and len(num_flower) == 0 and numm == 0:
+        
+        up = Vector((0.0, 0.0, 1.0))
+        rot = up.rotation_difference(norm).to_euler()
+        blomma.rotation_euler = rot
+        help.copy_obj(blomma, "add", loc.copy(), norm)
+        num_flower = list(bpy.data.collections["add"].objects)
+        locations.append(loc)
+    
     if hit and numm == 0:
-        
-            up = Vector((0.0, 0.0, 1.0))
-            rot = up.rotation_difference(norm).to_euler()
-            blomma.rotation_euler = rot
-            help.copy_obj(blomma, "add", loc.copy(), norm)
-            num_flower = list(bpy.data.collections["add"].objects)
-            
-            for i in locations:
-                if (i - loc).magnitude < 0.4 and len(num_flower) > 1:
-                    bpy.data.objects.remove(num_flower[-1], do_unlink=True)
-                    bpy.ops.outliner.orphans_purge()
-                    print(i.magnitude - loc.magnitude)
-                    break
-            locations.append(loc)
-            
-            
-                    #print(len(num_flower))
-                    
+    
+        up = Vector((0.0, 0.0, 1.0))
+        rot = up.rotation_difference(norm).to_euler()
+        blomma.rotation_euler = rot
+        help.copy_obj(blomma, "add", loc.copy(), norm)
+        num_flower = list(bpy.data.collections["add"].objects)
+        for i in locations:
+            if (i - loc).magnitude < 0.4:
+                bpy.data.objects.remove(num_flower[-1], do_unlink=True)
+                bpy.ops.outliner.orphans_purge()
+                break
+        locations.append(loc)
+           
                 
-
-        
-    #print(rand_ray.magnitude)
+print(count)
