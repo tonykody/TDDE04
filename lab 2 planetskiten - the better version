@@ -12,14 +12,15 @@ planet = bpy.data.objects["planet"]
 blomma = bpy.data.objects["blomma"]
 locations = []
 
-#help.copy_obj(obj, "models", loc, rot): 
-#help.copy_obj(blomma, "add", loc.copy(), norm)
-
+#skapar en funktion som tar fram en random (uniform) vektor. 
 def randomray():
     r = Vector((uniform(-1,1), uniform(-1,1), uniform(-1,1)))
     while r.magnitude == 0.0:
+        #om vektorn är en nollvektor, så kör vi om tills den inte är det
         r = Vector((uniform(-1,1), uniform(-1,1), uniform(-1,1)))
+    #vi gör om vektorn till en enhetsvektor
     r.normalize()
+    #vektorn som spottas ut av vår funktion är vad vi åberopar
     return r
 
 count = 0
@@ -31,33 +32,33 @@ while len(num_flower) < 201:
     begin = planet.location + rand_ray*10
     direction = planet.location - begin 
 
+    #Vi skapar en raycast som går från vår norm(randomray-vektor) med längd 10
+    #i riktningen tillbaka mot planeten
     res = bpy.context.scene.ray_cast(dp, begin, direction)
+    #raycasten ger tillbaka dessa värden
     hit, loc, norm, poly_ind, obj, mtrx = res
 
+    #vi definerar vårt materialindex så vi kan speca på rad 45 att vi vill utföra 
+    #vår if-loop om vi träffar mtrlindx 0
     numm = planet.data.polygons[poly_ind].material_index
-   
-    if hit and len(num_flower) == 0 and numm == 0:
-        
-        up = Vector((0.0, 0.0, 1.0))
-        rot = up.rotation_difference(norm).to_euler()
-        blomma.rotation_euler = rot
-        help.copy_obj(blomma, "add", loc.copy(), norm)
-        num_flower = list(bpy.data.collections["add"].objects)
-        locations.append(loc)
     
     if hit and numm == 0:
     
-        up = Vector((0.0, 0.0, 1.0))
         rot = up.rotation_difference(norm).to_euler()
         blomma.rotation_euler = rot
+        
+        #vi kopierar blomman som vi definerat på rad 12, och lägger till den i listan "add"
         help.copy_obj(blomma, "add", loc.copy(), norm)
         num_flower = list(bpy.data.collections["add"].objects)
+        #Uppdatera listan num_flower i loopen så att while-loopen får ett slut
+        
         for i in locations:
-            if (i - loc).magnitude < 0.4:
+            if len(num_flower) > 1 and (i - loc).magnitude < 0.4:
                 bpy.data.objects.remove(num_flower[-1], do_unlink=True)
                 bpy.ops.outliner.orphans_purge()
                 break
+        #Vi lägger till den tillagda blommans location i listan som vi kan jämföra med.
         locations.append(loc)
+        
            
-                
 print(count)
