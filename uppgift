@@ -1,0 +1,86 @@
+import bpy
+from random import uniform
+from mathutils import Vector
+
+mark = bpy.data.objects["Plane"]
+tree = bpy.data.objects["tree"]
+treelist = []
+locations = []
+
+
+up = Vector((0.0 , 0.0 , 1.0))
+
+
+def clean(collection_name):
+    for o in bpy.data.collections[collection_name].objects:
+        bpy.data.objects.remove(o, do_unlink=True)
+    bpy.ops.outliner.orphans_purge()
+    
+clean("add")
+
+def copy_obj(obj, coll_name, loc, rot): 
+    o = obj.copy()
+    o.location = loc.copy()
+    o.rotation_euler = up.rotation_difference(rot).to_euler()
+    bpy.data.collections[coll_name].objects.link(o)
+    return o
+
+def randomray():
+    r = Vector((uniform(-20,20), uniform(-20,20), 10))
+    while r.magnitude == 0.0:
+        #om vektorn är en nollvektor, så kör vi om tills den inte är det
+        r = Vector((uniform(-20,20), uniform(-20,20), 20))
+    #vi gör om vektorn till en enhetsvektor
+    r.normalize()
+    #vektorn som spottas ut av vår funktion är vad vi åberopar
+    return r
+"""
+while len(treelist) < 200:
+    rand_ray = randomray()
+    dp = bpy.context.view_layer.depsgraph
+    begin = mark.location + rand_ray*10
+    direction = mark.location - begin
+    res = bpy.context.scene.ray_cast(dp, begin, direction)
+    hit, loc, norm, poly_ind, obj, mtrx = res
+    numm = mark.data.polygons[poly_ind].material_index
+    
+    if hit and numm == 0:
+    
+        rot = up.rotation_difference(norm).to_euler()
+        tree.rotation_euler = rot
+        copy_obj(tree, "add", loc.copy(), norm)
+        treelist = list(bpy.data.collections["add"].objects)
+        
+        for i in locations:
+            if len(treelist) > 1 and (i - loc).magnitude < 0.4:
+                bpy.data.objects.remove(treelist[-1], do_unlink=True)
+                bpy.ops.outliner.orphans_purge()
+                break
+        locations.append(loc)
+"""
+        
+while len(locations) < 15:
+    rand_ray = randomray()
+    dp = bpy.context.view_layer.depsgraph
+    begin = rand_ray
+    direction = begin + Vector((0, 0, -10))
+    res = bpy.context.scene.ray_cast(dp, rand_ray, direction)
+    hit, loc, norm, poly_ind, obj, mtrx = res
+    numm = mark.data.polygons[poly_ind].material_index
+    if hit and numm == 0 and norm == up:
+        locations.append(loc)
+        print("Up is: ", up)
+        print("Norm is: ", norm)
+        copy_obj(tree, "add", loc.copy(), up)
+        #print("hej!")
+        #locations.append(loc)
+       # for i in locations:
+        #    print(i)
+        for i in locations: 
+            if len(locations) > 1 and (i-loc).magnitude < 0.4 and (i-loc).magnitude > 4:
+                
+                for i in treelist:
+                    
+                    bpy.data.location[i] = locations
+            else:
+                del locations[-1]
